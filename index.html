@@ -6,38 +6,43 @@
     <title>Guliguli 骰子連線版</title>
     <style>
         :root { --primary: #ff4757; --bg: #0d0d0d; --card: #1a1a1a; --gold: #f1c40f; --highlight: #ff2e2e; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        
         .container { width: 100%; max-width: 450px; }
-        .ui-card { background: var(--card); padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px; border: 1px solid #333; }
+        .ui-card { background: var(--card); padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px; border: 1px solid #333; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
         
         /* 骰子繪製 */
         .dice-container { display: flex; justify-content: center; gap: 10px; margin: 15px 0; }
-        .dice { width: 60px; height: 60px; background: #fff; border-radius: 10px; display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 6px; box-sizing: border-box; }
+        .dice { width: 60px; height: 60px; background: #fff; border-radius: 10px; display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 6px; box-sizing: border-box; box-shadow: inset 0 -3px 3px rgba(0,0,0,0.2); }
         .dot { width: 10px; height: 10px; background: #333; border-radius: 50%; visibility: hidden; align-self: center; justify-self: center; }
-        .dice[data-v="1"] .dot:nth-child(5) { visibility: visible; background: #ff4757; }
+        .dice[data-v="1"] .dot:nth-child(5) { visibility: visible; background: var(--primary); width: 14px; height: 14px; }
         .dice[data-v="2"] .dot:nth-child(1), .dice[data-v="2"] .dot:nth-child(9) { visibility: visible; }
         .dice[data-v="3"] .dot:nth-child(1), .dice[data-v="3"] .dot:nth-child(5), .dice[data-v="3"] .dot:nth-child(9) { visibility: visible; }
         .dice[data-v="4"] .dot:nth-child(1), .dice[data-v="4"] .dot:nth-child(3), .dice[data-v="4"] .dot:nth-child(7), .dice[data-v="4"] .dot:nth-child(9) { visibility: visible; }
         .dice[data-v="5"] .dot:nth-child(1), .dice[data-v="5"] .dot:nth-child(3), .dice[data-v="5"] .dot:nth-child(5), .dice[data-v="5"] .dot:nth-child(7), .dice[data-v="5"] .dot:nth-child(9) { visibility: visible; }
         .dice[data-v="6"] .dot:nth-child(1), .dice[data-v="6"] .dot:nth-child(3), .dice[data-v="6"] .dot:nth-child(4), .dice[data-v="6"] .dot:nth-child(6), .dice[data-v="6"] .dot:nth-child(7), .dice[data-v="6"] .dot:nth-child(9) { visibility: visible; }
 
-        input, select { background: #2d2d2d; color: white; border: 1px solid #444; padding: 12px; width: 100%; border-radius: 10px; margin-bottom: 10px; font-size: 16px; box-sizing: border-box; }
-        button { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 18px; }
-        button:disabled { opacity: 0.5; }
+        input, select { background: #2d2d2d; color: white; border: 1px solid #444; padding: 12px; width: 100%; border-radius: 10px; margin-bottom: 10px; font-size: 16px; box-sizing: border-box; outline: none; }
+        button { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 18px; transition: 0.2s; }
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        #scoreResult { font-size: 24px; font-weight: bold; color: var(--gold); margin: 10px 0; height: 30px; }
+        #scoreResult { font-size: 24px; font-weight: 800; color: var(--gold); margin: 10px 0; height: 30px; }
         
-        /* 排行榜優化 */
+        /* 排行榜 */
         .rank-board { background: var(--card); border-radius: 20px; padding: 15px; width: 100%; box-sizing: border-box; border: 1px solid #333; }
-        .rank-title { color: var(--gold); font-weight: bold; margin-bottom: 10px; text-align: center; }
-        .rank-item { padding: 10px 0; border-bottom: 1px solid #2a2a2a; font-size: 14px; line-height: 1.6; }
-        .player-info { display: flex; justify-content: space-between; margin-bottom: 4px; }
-        .score-details { font-size: 12px; color: #888; letter-spacing: 1px; }
-        .hl { color: var(--highlight) !important; font-weight: bold; }
+        .rank-title { color: var(--gold); font-weight: bold; margin-bottom: 15px; text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px; font-size: 18px; }
+        .rank-item { padding: 12px 0; border-bottom: 1px solid #2a2a2a; font-size: 14px; line-height: 1.6; animation: fadeIn 0.4s ease-out; }
+        .player-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .score-details { font-size: 12px; color: #777; letter-spacing: 0.5px; }
+        .hl { color: var(--highlight) !important; font-weight: bold; text-shadow: 0 0 5px rgba(255,46,46,0.3); }
 
-        .admin-box { display: none; background: #1b3022; padding: 15px; border-radius: 12px; margin-top: 15px; border: 1px solid #2ecc71; }
+        /* 管理面板 */
+        .admin-box { display: none; background: #1b3022; padding: 15px; border-radius: 12px; margin-top: 15px; border: 1px solid #2ecc71; text-align: left; }
+        .admin-box p { margin: 0 0 8px 0; color: #2ecc71; font-weight: bold; font-size: 13px; }
+        
         .rolling { animation: shake 0.1s infinite; }
         @keyframes shake { 0% {transform: rotate(2deg)} 50% {transform: rotate(-2deg)} 100% {transform: rotate(2deg)} }
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(5px);} to {opacity: 1; transform: translateY(0);} }
     </style>
 </head>
 <body>
@@ -45,7 +50,7 @@
 <div class="container">
     <div class="ui-card">
         <input type="text" id="userName" placeholder="👤 輸入大名">
-        <div id="chanceInfo" style="font-size: 12px; color: #888; margin-bottom: 10px;">載入數據中...</div>
+        <div id="chanceInfo" style="font-size: 12px; color: #888; margin-bottom: 10px;">請輸入名字載入進度</div>
         
         <div class="dice-container">
             <div class="dice" id="d1" data-v="1"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
@@ -57,66 +62,95 @@
         <button id="rollBtn" onclick="handleRoll()">立即擲骰</button>
 
         <div id="adminPanel" class="admin-box">
-            <p style="margin:0 0 10px 0; color:#2ecc71; font-size:12px;">🛠️ Guliguli 全球控制台</p>
+            <p>🔧 Guliguli 全球控制台</p>
             <select id="rankMode" onchange="syncModeToServer(this.value)">
-                <option value="max">🏆 排序：單次最大</option>
-                <option value="sum_max">🔥 排序：最大總和</option>
-                <option value="min">🧊 排序：單次最小</option>
-                <option value="sum_min">💀 排序：最小總和</option>
+                <option value="max">🏆 全球同步：單次最大</option>
+                <option value="sum_max">🔥 全球同步：最大總和</option>
+                <option value="min">🧊 全球同步：單次最小</option>
+                <option value="sum_min">💀 全球同步：最小總和</option>
             </select>
-            <button onclick="resetData()" style="background:#c0392b; font-size:12px; padding:8px; margin-top:5px;">清空全球紀錄</button>
+            <button onclick="resetData()" style="background:#c0392b; font-size:12px; padding:8px; margin-top:5px; width:100%;">清空全球數據</button>
         </div>
     </div>
 
     <div class="rank-board">
-        <div class="rank-title" id="modeTitle">載入中...</div>
-        <div id="rankList">連線中...</div>
+        <div class="rank-title" id="modeTitle">🏆 全球排行載入中...</div>
+        <div id="rankList" style="text-align:center; color:#555;">連線同步中...</div>
     </div>
 </div>
 
 <script>
-    const API_URL = "你的AppsScript網址";
+    // 🔗 請將此處換成你的 Apps Script URL
+    const API_URL = "https://script.google.com/macros/s/AKfycbxKb5ObMpHXa4HZNF_sPe4OFeQVhJC8pDUn4dOp134O5hDydqhKhdHdqD5S0gdO_ss/exec";
+    
     let rawData = [];
     let currentMode = "max";
 
+    // 監聽名字輸入
     document.getElementById('userName').addEventListener('input', (e) => {
-        document.getElementById('adminPanel').style.display = (e.target.value === "Guliguli") ? "block" : "none";
+        const val = e.target.value.trim();
+        document.getElementById('adminPanel').style.display = (val === "Guliguli") ? "block" : "none";
         updateUI();
     });
 
+    // 核心數據抓取
     async function fetchAll() {
         try {
             const res = await fetch(API_URL);
             const json = await res.json();
             rawData = json.scores;
-            currentMode = json.currentMode;
-            document.getElementById('rankMode').value = currentMode;
+            currentMode = json.currentMode || "max";
+            
+            // 如果不是管理員，則自動同步 UI 下拉選單顯示
+            if (document.getElementById('userName').value !== "Guliguli") {
+                document.getElementById('rankMode').value = currentMode;
+            }
+            
             processAndRender();
             updateUI();
-        } catch (e) { console.log("Sync Error"); }
+        } catch (e) { console.log("Fetch Error"); }
     }
 
+    // 管理員切換同步模式
     async function syncModeToServer(mode) {
         currentMode = mode;
-        fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'setMode', mode: mode, admin: 'Guliguli' }) });
-        processAndRender();
+        processAndRender(); // 立即渲染本地，增加流暢感
+        try {
+            await fetch(API_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify({ action: 'setMode', mode: mode, admin: 'Guliguli' }) 
+            });
+        } catch (e) { console.log("Sync Mode Error"); }
     }
 
     function updateUI() {
         const name = document.getElementById('userName').value.trim();
         const btn = document.getElementById('rollBtn');
+        const info = document.getElementById('chanceInfo');
+        
+        if (!name) {
+            btn.disabled = true;
+            info.innerText = "輸入大名以查看進度";
+            return;
+        }
+
         const count = rawData.filter(r => r[1] === name).length;
         const remains = 3 - count;
-        document.getElementById('chanceInfo').innerText = name ? `玩家：${name} | 剩餘：${remains < 0 ? 0 : remains}次` : "請輸入名字";
-        btn.disabled = !name || remains <= 0;
+        info.innerText = `玩家：${name} | 剩餘：${remains < 0 ? 0 : remains}次`;
+        btn.innerText = remains <= 0 ? "次數已用完" : "立即擲骰";
+        btn.disabled = remains <= 0;
     }
 
-    function handleRoll() {
+    async function handleRoll() {
         const name = document.getElementById('userName').value.trim();
         const dices = document.querySelectorAll('.dice');
         const btn = document.getElementById('rollBtn');
+        const resDiv = document.getElementById('scoreResult');
+
         btn.disabled = true;
         dices.forEach(d => d.classList.add('rolling'));
+        resDiv.innerText = "正在求神問卜...";
 
         setTimeout(async () => {
             let total = 0;
@@ -126,9 +160,19 @@
                 d.setAttribute('data-v', v);
                 total += v;
             });
-            document.getElementById('scoreResult').innerText = `${total} 點！`;
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'save', name: name, score: total }) });
-            setTimeout(fetchAll, 1000);
+            resDiv.innerText = `${total} 點！`;
+
+            try {
+                // 發送數據到 Server
+                await fetch(API_URL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    body: JSON.stringify({ action: 'save', name: name, score: total }) 
+                });
+                
+                // 🚀 操作者立即更新 (非對稱同步策略)
+                await fetchAll(); 
+            } catch (e) { alert("存檔失敗"); btn.disabled = false; }
         }, 800);
     }
 
@@ -140,6 +184,7 @@
         const players = {};
         rawData.forEach(r => {
             const name = r[1], score = parseInt(r[2]);
+            if(!name) return;
             if(!players[name]) players[name] = { name, history: [], sum: 0, max: 0, min: 99 };
             players[name].history.push(score);
             players[name].sum += score;
@@ -157,12 +202,15 @@
         listDiv.innerHTML = sorted.map((p, i) => {
             const h = p.history;
             const isSum = currentMode.includes('sum');
-            const targetVal = isSum ? p.sum : (currentMode === 'min' ? p.min : p.max);
             
-            // 標示 Highlight
-            const h1 = (h[0] && (currentMode==='max' && h[0]===p.max || currentMode==='min' && h[0]===p.min)) ? 'hl' : '';
-            const h2 = (h[1] && (currentMode==='max' && h[1]===p.max || currentMode==='min' && h[1]===p.min)) ? 'hl' : '';
-            const h3 = (h[2] && (currentMode==='max' && h[2]===p.max || currentMode==='min' && h[2]===p.min)) ? 'hl' : '';
+            // 計算 Highlight 邏輯
+            const checkHL = (val) => {
+                if (isSum) return '';
+                if (currentMode === 'max' && val === p.max) return 'hl';
+                if (currentMode === 'min' && val === p.min) return 'hl';
+                return '';
+            };
+
             const sumHl = isSum ? 'hl' : '';
 
             return `
@@ -172,22 +220,24 @@
                     <span class="${sumHl}">${p.sum} 點</span>
                 </div>
                 <div class="score-details">
-                    ( 1st: <span class="${h1}">${h[0]||'-'}</span>, 
-                      2nd: <span class="${h2}">${h[1]||'-'}</span>, 
-                      3rd: <span class="${h3}">${h[2]||'-'}</span> )
+                    ( 1st: <span class="${checkHL(h[0])}">${h[0]||'-'}</span>, 
+                      2nd: <span class="${checkHL(h[1])}">${h[1]||'-'}</span>, 
+                      3rd: <span class="${checkHL(h[2])}">${h[2]||'-'}</span> )
                 </div>
             </div>`;
-        }).join('');
+        }).join('') || `<div style="padding:20px; color:#444;">尚無歷史紀錄</div>`;
     }
 
     async function resetData() {
-        if(!confirm("確定清空嗎？")) return;
+        if(!confirm("Guliguli，確定清空全球數據？")) return;
         await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'reset', admin: 'Guliguli' }) });
         location.reload();
     }
 
+    // 初始載入
     fetchAll();
-    setInterval(fetchAll, 15000); // 每 15 秒全球同步一次
+    // 全球每 10 秒靜默同步一次別人的動作
+    setInterval(fetchAll, 10000);
 </script>
 </body>
 </html>
